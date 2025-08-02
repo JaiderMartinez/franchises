@@ -8,6 +8,8 @@ tags:
     description: Operations related to franchise management
   - name: Branches
     description: Operations for managing products within a branch
+  - name: Products
+    description: Operations related to managing branches within a franchise
 
 paths:
   /franchises:
@@ -142,6 +144,94 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorDto'
+  /franchises/{franchiseId}/branches/{branchId}/products:
+    post:
+      tags:
+        - Products
+      summary: Add a new product to a branch
+      operationId: createProduct
+      parameters:
+        - name: franchiseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+        - name: branchId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: The product has been successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: If the request data structure is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+
+  /franchises/{franchiseId}/branches/{branchId}/products/{productId}:
+    patch:
+      tags:
+        - Products
+      summary: Partial update of a product
+      operationId: partialUpdateProduct
+      parameters:
+        - name: franchiseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+        - name: branchId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '200':
+          description: Product successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: The request data structure is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
 
 components:
   schemas:
@@ -183,6 +273,27 @@ components:
           example: 123
         name:
           type: string
+
+    ProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 123
+        name:
+          type: string
+      required:
+        - id
+        - name
 
     ErrorDto:
       type: object

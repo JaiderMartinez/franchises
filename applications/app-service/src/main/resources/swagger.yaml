@@ -92,14 +92,10 @@ components:
         code:
           type: string
           example: "400"
-        messageEn:
+        message:
           type: string
-          description: Error message in English
+          description: Error message
           example: "Invalid request data"
-        messageEs:
-          type: string
-          description: Error message in Spanish
-          example: "Datos de la solicitud inválidos"
       required:
         - code
         - message

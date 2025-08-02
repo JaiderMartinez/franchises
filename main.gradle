@@ -43,6 +43,13 @@ subprojects {
         implementation platform("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
     }
 
+    if (project.name != 'model' && project.name != 'usecase') {
+        dependencies {
+            implementation "org.mapstruct:mapstruct:${mapstruct}"
+            annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct}"
+        }
+    }
+
     tasks.withType(Test).configureEach {
         if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_13)) {
             jvmArgs += [
@@ -81,6 +88,13 @@ subprojects {
         }
     }
 
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs += [
+                '-parameters',
+                '-Amapstruct.defaultComponentModel=spring',
+                '-Amapstruct.suppressGeneratorTimestamp=true'
+        ]
+    }
 }
 
 jacoco {
@@ -99,12 +113,6 @@ tasks.register('jacocoMergedReport', JacocoReport) {
         csv.setRequired false
         html.setRequired true
     }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs = [
-            '-Amapstruct.suppressGeneratorTimestamp=true'
-    ]
 }
 
 pitestReportAggregate {

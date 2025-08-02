@@ -3,6 +3,28 @@
 This project includes an AWS CloudFormation template to deploy a **RDS PostgreSQL** (Free Tier) database and a guide to run a Java application packaged as a Docker container.
 
 ---
+## 0. Local Setup with Docker Compose
+
+For local development and testing, you can run both the PostgreSQL database and the API using **Docker Compose**.
+
+### **Step 1: Build the JAR**
+
+From the project root, run:
+
+```bash
+./gradlew jar
+```
+
+This will generate the executable JAR file in the build/libs/ directory.
+
+### **Step 2: Start services with Docker Compose**
+Run
+```bash
+docker-compose -f deployment/docker-compose.yml up --build
+```
+Both services will be on the same Docker network (`franchise_network`), allowing the API to access the database via the hostname `postgres_db`.
+
+---
 
 ## 1. Deploying RDS PostgreSQL via CloudFormation
 

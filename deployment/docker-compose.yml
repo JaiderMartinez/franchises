@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  postgres_db:
+    image: postgres:17.4
+    container_name: postgres_db
+    env_file:
+      - local-environment.env
+    ports:
+      - "5432:5432"
+    networks:
+      - franchise_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  franchise_api:
+    build:
+      context: ../
+      dockerfile: deployment/Dockerfile
+    container_name: franchise_api
+    depends_on:
+      - postgres_db
+    ports:
+      - "8080:8080"
+    networks:
+      - franchise_network
+    env_file:
+      - local-environment.env #Para usar la conexión local
+      - docs/config.env #Para usar la conexión de aws
+
+networks:
+  franchise_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

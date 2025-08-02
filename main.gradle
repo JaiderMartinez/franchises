@@ -92,7 +92,8 @@ subprojects {
         options.compilerArgs += [
                 '-parameters',
                 '-Amapstruct.defaultComponentModel=spring',
-                '-Amapstruct.suppressGeneratorTimestamp=true'
+                '-Amapstruct.suppressGeneratorTimestamp=true',
+                '-Amapstruct.suppressUnmappedTargetPropertiesWarning=true'
         ]
     }
 }

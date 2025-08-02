@@ -21,4 +21,11 @@ public class FranchiseValidator {
                         : Mono.empty());
     }
 
+    public Mono<Void> validateFranchiseExists(Long franchiseId) {
+        return franchiseRepository.existsFranchiseById(franchiseId)
+                .flatMap(exists -> Boolean.TRUE.equals(exists)
+                        ? Mono.empty()
+                        : Mono.error(new FranchiseException(ErrorCode.F404000)));
+    }
+
 }

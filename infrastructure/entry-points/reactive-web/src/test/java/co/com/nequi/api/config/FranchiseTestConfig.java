@@ -1,4 +1,4 @@
-package co.com.nequi.api;
+package co.com.nequi.api.config;
 
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;

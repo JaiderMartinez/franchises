@@ -2,7 +2,6 @@ package co.com.nequi.usecase.franchise.validator;
 
 import co.com.nequi.model.exception.ErrorCode;
 import co.com.nequi.model.exception.FranchiseException;
-import co.com.nequi.model.franchise.Franchise;
 import co.com.nequi.model.franchise.gateways.FranchiseRepository;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;

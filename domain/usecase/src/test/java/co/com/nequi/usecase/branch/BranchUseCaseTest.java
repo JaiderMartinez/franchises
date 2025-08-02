@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +22,8 @@ import reactor.test.StepVerifier;
 @ExtendWith(MockitoExtension.class)
 class BranchUseCaseTest {
 
+    private static Long franchiseId;
+    private static Branch branch;
     @Mock
     private BranchRepository branchRepository;
     @Mock
@@ -31,9 +32,6 @@ class BranchUseCaseTest {
     private FranchiseValidator franchiseValidator;
     @InjectMocks
     private BranchUseCase branchUseCase;
-
-    private static Long franchiseId;
-    private static Branch branch;
 
     @BeforeAll
     static void setUp() {
@@ -62,7 +60,8 @@ class BranchUseCaseTest {
     void partialUpdateBranch_successfully() {
         when(franchiseValidator.validateFranchiseExists(franchiseId)).thenReturn(Mono.empty());
         when(branchValidator.validateBranchExists(franchiseId, branch.id())).thenReturn(Mono.empty());
-        when(branchValidator.validateBranchNameUniqueWithinFranchise(franchiseId, branch.name())).thenReturn(Mono.empty());
+        when(branchValidator.validateBranchNameUniqueWithinFranchise(franchiseId, branch.name())).thenReturn(
+                Mono.empty());
         when(branchRepository.save(any(Branch.class))).thenReturn(Mono.just(branch));
 
         StepVerifier.create(branchUseCase.partialUpdateBranch(franchiseId, branch))

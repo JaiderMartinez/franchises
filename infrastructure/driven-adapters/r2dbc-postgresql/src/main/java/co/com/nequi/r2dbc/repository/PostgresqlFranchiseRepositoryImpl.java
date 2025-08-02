@@ -28,6 +28,11 @@ public class PostgresqlFranchiseRepositoryImpl implements FranchiseRepository {
     }
 
     @Override
+    public Mono<Boolean> existsFranchiseById(Long franchiseId) {
+        return franchiseDao.existsById(franchiseId);
+    }
+
+    @Override
     public Mono<Franchise> save(Franchise franchise) {
         return franchiseDao.save(franchiseEntityMapper.toEntity(franchise))
                 .map(franchiseEntityMapper::toModel);

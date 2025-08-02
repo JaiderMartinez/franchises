@@ -10,8 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import co.com.nequi.api.dto.FranchiseRequest;
-import co.com.nequi.api.dto.FranchiseResponse;
+import co.com.nequi.api.config.FranchiseTestConfig;
+import co.com.nequi.api.dto.request.FranchiseRequest;
+import co.com.nequi.api.dto.response.FranchiseResponse;
 import co.com.nequi.api.mappper.FranchiseMapper;
 import co.com.nequi.model.franchise.Franchise;
 import co.com.nequi.usecase.franchise.FranchiseUseCase;

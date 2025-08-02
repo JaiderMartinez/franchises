@@ -15,7 +15,6 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import co.com.nequi.api.dto.ErrorDto;
 import co.com.nequi.model.exception.FranchiseException;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;

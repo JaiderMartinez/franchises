@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import co.com.nequi.api.dto.FranchiseRequest;
-import co.com.nequi.api.dto.FranchiseResponse;
+import co.com.nequi.api.dto.request.FranchiseRequest;
+import co.com.nequi.api.dto.response.FranchiseResponse;
 import co.com.nequi.api.mappper.FranchiseMapper;
 import co.com.nequi.usecase.franchise.FranchiseUseCase;
 import lombok.RequiredArgsConstructor;

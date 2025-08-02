@@ -1,0 +1,105 @@
+openapi: 3.0.0
+info:
+  title: Franchise Management API
+  version: 1.0.0
+  description: API for managing franchises, their branches, and offered products.
+tags:
+  - name: Franchises
+    description: Operations related to franchise management
+
+paths:
+  /franchises:
+    post:
+      tags:
+        - Franchises
+      summary: Add a new franchise
+      operationId: createFranchise
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FranchiseRequest'
+      responses:
+        '201':
+          description: Franchise created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FranchiseResponse'
+        '400':
+          description: If the request data structure is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+  /franchises/{franchiseId}:
+    patch:
+      tags:
+        - Franchises
+      summary: Partial update of a franchise
+      operationId: partialUpdateFranchise
+      parameters:
+        - name: franchiseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FranchiseRequest'
+      responses:
+        '204':
+          description: Franchise updated
+        '400':
+          description: If the request data structure is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDto'
+
+components:
+  schemas:
+    FranchiseRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the franchise
+          example: Subway
+      required:
+        - name
+
+    FranchiseResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 123
+        name:
+          type: string
+          description: Name of the franchise
+
+    ErrorDto:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "400"
+        messageEn:
+          type: string
+          description: Error message in English
+          example: "Invalid request data"
+        messageEs:
+          type: string
+          description: Error message in Spanish
+          example: "Datos de la solicitud inválidos"
+      required:
+        - code
+        - message

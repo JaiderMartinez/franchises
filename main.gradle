@@ -88,10 +88,13 @@ subprojects {
         }
     }
 
-    compileJava {
-        options.compilerArgs = ['-Amapstruct.defaultComponentModel=spring']
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs += [
+                '-parameters',
+                '-Amapstruct.defaultComponentModel=spring',
+                '-Amapstruct.suppressGeneratorTimestamp=true'
+        ]
     }
-
 }
 
 jacoco {
@@ -110,12 +113,6 @@ tasks.register('jacocoMergedReport', JacocoReport) {
         csv.setRequired false
         html.setRequired true
     }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs = [
-            '-Amapstruct.suppressGeneratorTimestamp=true'
-    ]
 }
 
 pitestReportAggregate {

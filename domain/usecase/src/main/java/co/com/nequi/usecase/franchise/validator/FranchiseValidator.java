@@ -12,7 +12,10 @@ public class FranchiseValidator {
     private final FranchiseRepository franchiseRepository;
 
     public Mono<Void> validateUniqueName(String franchiseName) {
-        return franchiseRepository.existsFranchise(franchiseName)
+        return Mono.justOrEmpty(franchiseName)
+                .filter(name -> !name.isBlank())
+                .switchIfEmpty(Mono.error(new FranchiseException(ErrorCode.F400000)))
+                .flatMap(franchiseRepository::existsFranchise)
                 .flatMap(exists -> Boolean.TRUE.equals(exists)
                         ? Mono.error(new FranchiseException(ErrorCode.F409000))
                         : Mono.empty());

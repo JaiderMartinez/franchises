@@ -2,11 +2,13 @@ package co.com.nequi.r2dbc.repository;
 
 import org.springframework.stereotype.Repository;
 
+import co.com.nequi.model.franchise.ProductStock;
 import co.com.nequi.model.product.Product;
 import co.com.nequi.model.product.gateways.ProductRepository;
 import co.com.nequi.r2dbc.dao.ProductDao;
 import co.com.nequi.r2dbc.mapper.ProductEntityMapper;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -30,6 +32,18 @@ public class PostgresqlProductRepositoryImpl implements ProductRepository {
     public Mono<Product> save(Product product) {
         return productDao.save(productMapper.toEntity(product))
                 .map(productMapper::toModel);
+    }
+
+    @Override
+    public Mono<Product> get(Long productId) {
+        return productDao.findById(productId)
+                .map(productMapper::toModel);
+    }
+
+    @Override
+    public Flux<ProductStock> getProductsWithMaxStockByFranchise(Long franchiseId) {
+        return productDao.findProductsWithMaxStockByFranchise(franchiseId)
+                .map(productMapper::toProductStock);
     }
 
 }

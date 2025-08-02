@@ -10,6 +10,8 @@ tags:
     description: Operations for managing products within a branch
   - name: Products
     description: Operations related to managing branches within a franchise
+  - name: Stocks
+    description: Operations for updating or retrieving stock information for products.
 
 paths:
   /franchises:
@@ -233,6 +235,73 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorDto'
 
+  /franchises/{franchiseId}/branches/{branchId}/products/{productId}/stocks:
+    patch:
+      tags:
+        - Stocks
+      summary: Update stock of a product
+      operationId: updateStock
+      parameters:
+        - name: franchiseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+        - name: branchId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stock:
+                  type: integer
+              required:
+                - stock
+      responses:
+        '200':
+          description: Stock updated
+
+  /franchises/{franchiseId}/branches/products/stocks/top:
+    get:
+      tags:
+        - Stocks
+      summary: Get top-stocked product per branch for a franchise
+      operationId: getProductWithMaxStock
+      parameters:
+        - name: franchiseId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 123
+      responses:
+        '200':
+          description: List of top-stocked products by branch
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TopStockProductResponse'
+
 components:
   schemas:
     FranchiseRequest:
@@ -279,8 +348,10 @@ components:
       properties:
         name:
           type: string
-      required:
-        - name
+        stock:
+          type: integer
+          format: int32
+          example: 10
 
     ProductResponse:
       type: object
@@ -294,6 +365,38 @@ components:
       required:
         - id
         - name
+
+    ProductStockResponse:
+      type: object
+      required:
+        - id
+        - name
+        - stock
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Product identifier
+          example: 123
+        name:
+          type: string
+          description: Product name
+          example: Coca-Cola
+        stock:
+          type: integer
+          format: int32
+          description: Available units in stock
+          example: 10
+
+    TopStockProductResponse:
+      type: object
+      properties:
+        branchName:
+          type: string
+          description: Branch name
+          example: North Branch
+        product:
+            $ref: '#/components/schemas/ProductStockResponse'
 
     ErrorDto:
       type: object

@@ -1,47 +1,107 @@
-# Proyecto Base Implementando Clean Architecture
+# Infrastructure as Code and Application Deployment - Franchise Demo
 
-## Antes de Iniciar
+This project includes an AWS CloudFormation template to deploy a **RDS PostgreSQL** (Free Tier) database and a guide to run a Java application packaged as a Docker container.
 
-Empezaremos por explicar los diferentes componentes del proyectos y partiremos de los componentes externos, continuando con los componentes core de negocio (dominio) y por último el inicio y configuración de la aplicación.
+---
 
-Lee el artículo [Clean Architecture — Aislando los detalles](https://medium.com/bancolombia-tech/clean-architecture-aislando-los-detalles-4f9530f35d7a)
+## 1. Deploying RDS PostgreSQL via CloudFormation
 
-# Arquitectura
+The template is located at: `deployment/docs/rds-postgresql.yaml`
 
-![Clean Architecture](https://miro.medium.com/max/1400/1*ZdlHz8B0-qu9Y-QO3AXR_w.png)
+### **Main Parameters**
 
-## Domain
+- **MyPCIP**:\
+  Defines the IP (or range) from which PostgreSQL database access is allowed.
+    - Example: `201.184.1.10/32`
+    - Default value: `201.184.1.10/32/32`\
+      Change this value if you need access from a different IP.
 
-Es el módulo más interno de la arquitectura, pertenece a la capa del dominio y encapsula la lógica y reglas del negocio mediante modelos y entidades del dominio.
+### **Deployment Steps**
 
-## Usecases
+1. Log in to the [AWS Console](https://console.aws.amazon.com/).
 
-Este módulo gradle perteneciente a la capa del dominio, implementa los casos de uso del sistema, define lógica de aplicación y reacciona a las invocaciones desde el módulo de entry points, orquestando los flujos hacia el módulo de entities.
+2. Go to **CloudFormation** > **Create stack** > **With new resources (standard)**.
 
-## Infrastructure
+3. Upload the `rds-postgresql.yaml` file.
 
-### Helpers
+4. Fill in the **MyPCIP** parameter with the public IP address from which you will connect (or `0.0.0.0/0` for open access, **not recommended**).
 
-En el apartado de helpers tendremos utilidades generales para los Driven Adapters y Entry Points.
+5. Optionally, customize the following values or use the defaults:
 
-Estas utilidades no están arraigadas a objetos concretos, se realiza el uso de generics para modelar comportamientos
-genéricos de los diferentes objetos de persistencia que puedan existir, este tipo de implementaciones se realizan
-basadas en el patrón de diseño [Unit of Work y Repository](https://medium.com/@krzychukosobudzki/repository-design-pattern-bc490b256006)
+    - **DBInstanceIdentifier**: franchises-postgres-freetier
+    - **MasterUsername**: postgres
+    - **MasterUserPassword**: ChangeMe123!
 
-Estas clases no puede existir solas y debe heredarse su compartimiento en los **Driven Adapters**
+6. Wait until the stack creation completes.\
+   The RDS endpoint will be shown in the **outputs** of the stack.
 
-### Driven Adapters
+#### **⚠️ Security Notice**
 
-Los driven adapter representan implementaciones externas a nuestro sistema, como lo son conexiones a servicios rest,
-soap, bases de datos, lectura de archivos planos, y en concreto cualquier origen y fuente de datos con la que debamos
-interactuar.
+> - By default, the template allows global access (`0.0.0.0/0`).\
+    >   **This is insecure.**\
+    >   For better security, set the `MyPCIP` parameter to your actual IP or an exact access range.
+> - Do not use the default password in production.
+> - The `PubliclyAccessible` parameter is enabled to allow connections from outside AWS. Disable it if you do not need external access.
 
-### Entry Points
+---
 
-Los entry points representan los puntos de entrada de la aplicación o el inicio de los flujos de negocio.
+## 2. Building and Running the Docker Container
 
-## Application
+### **Build the Image**
 
-Este módulo es el más externo de la arquitectura, es el encargado de ensamblar los distintos módulos, resolver las dependencias y crear los beans de los casos de use (UseCases) de forma automática, inyectando en éstos instancias concretas de las dependencias declaradas. Además inicia la aplicación (es el único módulo del proyecto donde encontraremos la función “public static void main(String[] args)”.
+```bash
+docker build -f deployment/Dockerfile -t franchises-app .
+```
 
-**Los beans de los casos de uso se disponibilizan automaticamente gracias a un '@ComponentScan' ubicado en esta capa.**
+- Ensure your application's JAR file and Dockerfile are in the correct paths.
+
+### **Prepare the Environment File**
+
+Edit or create the file:\
+`deployment/docs/config.env`\
+Sample variables:
+
+```
+R2DBC_URL=
+R2DBC_USERNAME=
+R2DBC_PASSWORD=
+```
+
+### **Run the Container**
+
+```bash
+docker run -d --name franchises-app -p 8080:8080 --env-file deployment/docs/config.env franchises-app
+```
+
+- Access the application at: [http://localhost:8080](http://localhost:8080)
+- Change the ports if your app uses a different port.
+
+---
+
+## 3. Recommendations and Warnings
+
+- **Do not expose the database to the entire world (**``**) unless for disposable testing purposes.**
+- Delete the database when not in use to avoid unexpected charges.
+- Do not upload sensitive files (such as `.env` or passwords) to public repositories.
+- Change the default password (`ChangeMe123!`) before using it in any real environment.
+
+---
+
+## 4. API Testing with Postman and Swagger
+
+### **Using Postman**
+
+- A Postman collection is included to simplify API testing and exploration. `deployment/docs/Franchise Management API.postman_collection.json`
+- Import the collection into Postman to run sample requests against your deployed API endpoints.
+- Make sure to update the environment variables (such as base URL or authentication) to match your deployment.
+
+### **API Documentation (OpenAPI/Swagger)**
+
+- The file `applications/app-service/src/main/resources/swagger.yaml` provides the complete OpenAPI specification for the Franchise API.
+- You can visualize and interact with the API using the [Swagger Editor](https://editor.swagger.io/) or other compatible tools.
+- To use it:
+    1. Open [Swagger Editor](https://editor.swagger.io/)
+    2. Import or copy-paste the contents of `swagger.yaml`
+    3. Review endpoints, payloads, and try out requests directly from the browser
+
+---

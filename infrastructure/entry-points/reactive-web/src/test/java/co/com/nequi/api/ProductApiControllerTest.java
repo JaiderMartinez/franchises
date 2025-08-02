@@ -34,9 +34,9 @@ class ProductApiControllerTest {
     void createProduct_withValidRequest_shouldReturnProductResponseAndStatusCreated() {
         Long franchiseId = 1L;
         Long branchId = 100L;
-        ProductRequest request = new ProductRequest("Coca-Cola");
+        ProductRequest request = new ProductRequest("Coca-Cola", 1);
         Product product = new Product(request.name(), branchId);
-        ProductResponse response = new ProductResponse(1L, product.name());
+        ProductResponse response = new ProductResponse(1L, product.name(), 1);
 
         when(productMapper.toModel(request, branchId)).thenReturn(product);
         when(productUseCase.createProduct(franchiseId, product)).thenReturn(Mono.just(product));
@@ -58,16 +58,41 @@ class ProductApiControllerTest {
         Long franchiseId = 1L;
         Long branchId = 100L;
         Long productId = 200L;
-        ProductRequest request = new ProductRequest("Coca-Cola Zero");
+        ProductRequest request = new ProductRequest("Coca-Cola Zero", 1);
         Product updatedProduct = new Product(productId, request.name(), branchId);
-        ProductResponse response = new ProductResponse(productId, updatedProduct.name());
+        ProductResponse response = new ProductResponse(productId, updatedProduct.name(), 1);
 
-        when(productMapper.toModel(request, branchId)).thenReturn(updatedProduct);
+        when(productMapper.toModel(request, branchId, productId)).thenReturn(updatedProduct);
         when(productUseCase.partialUpdateProduct(franchiseId, updatedProduct)).thenReturn(Mono.just(updatedProduct));
         when(productMapper.toResponse(updatedProduct)).thenReturn(response);
 
         webTestClient.patch()
                 .uri(BASE_PATH + "/{productId}", franchiseId, branchId, productId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(ProductResponse.class)
+                .isEqualTo(response);
+    }
+
+    @Test
+    void updateStock_withValidRequest_shouldReturnProductResponseAndStatusOk() {
+        Long franchiseId = 1L;
+        Long branchId = 100L;
+        Long productId = 200L;
+        Integer stock = 55;
+        ProductRequest request = new ProductRequest("Coca-Cola Zero", stock);
+        Product updatedProduct = new Product(productId, request.name(), branchId, stock);
+        ProductResponse response = new ProductResponse(productId, updatedProduct.name(), stock);
+
+        when(productMapper.toModel(request, branchId, productId)).thenReturn(updatedProduct);
+        when(productUseCase.updateStock(franchiseId, updatedProduct)).thenReturn(Mono.just(updatedProduct));
+        when(productMapper.toResponse(updatedProduct)).thenReturn(response);
+
+        webTestClient.patch()
+                .uri(BASE_PATH + "/{productId}/stocks", franchiseId, branchId, productId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()

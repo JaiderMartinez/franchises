@@ -44,12 +44,28 @@ public class ProductApiController {
             produces = { MediaType.APPLICATION_JSON_VALUE },
             consumes = { MediaType.APPLICATION_JSON_VALUE }
     )
-    public Mono<ResponseEntity<ProductResponse>> partialUpdateBranch(@PathVariable Long franchiseId,
+    public Mono<ResponseEntity<ProductResponse>> partialUpdateProduct(@PathVariable Long franchiseId,
                                                                      @PathVariable Long branchId,
+                                                                     @PathVariable Long productId,
                                                                      @RequestBody Mono<ProductRequest> productRequest) {
         return productRequest
-                .map(productReq -> productMapper.toModel(productReq, branchId))
+                .map(productReq -> productMapper.toModel(productReq, branchId, productId))
                 .flatMap(product -> productUseCase.partialUpdateProduct(franchiseId, product))
+                .map(productMapper::toResponse)
+                .map(ResponseEntity::ok);
+    }
+
+    @PatchMapping(value = "/{productId}/stocks",
+            produces = { MediaType.APPLICATION_JSON_VALUE },
+            consumes = { MediaType.APPLICATION_JSON_VALUE }
+    )
+    public Mono<ResponseEntity<ProductResponse>> updateStock(@PathVariable Long franchiseId,
+                                                             @PathVariable Long branchId,
+                                                             @PathVariable Long productId,
+                                                             @RequestBody Mono<ProductRequest> productRequest) {
+        return productRequest
+                .map(productReq -> productMapper.toModel(productReq, branchId, productId))
+                .flatMap(product -> productUseCase.updateStock(franchiseId, product))
                 .map(productMapper::toResponse)
                 .map(ResponseEntity::ok);
     }

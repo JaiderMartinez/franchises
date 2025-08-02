@@ -12,9 +12,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "franchises")
-public class FranchiseEntity {
+@Table(name = "products")
+public class ProductEntity {
     @Id
     private Long id;
     private String name;
+    private Long branchId;
 }
